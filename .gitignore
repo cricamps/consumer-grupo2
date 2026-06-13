@@ -1,0 +1,17 @@
+target/
+*.class
+*.jar
+*.war
+.idea/
+*.iml
+.vscode/
+*.log
+
+# No subir el wallet ni credenciales
+wallet/
+Wallet_*/
+*.sso
+*.p12
+*.pem
+*.jks
+ojdbc.properties
