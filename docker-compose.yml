@@ -1,8 +1,72 @@
-version: '3'
+version: '3.8'
+
+# Sumativa S6 - Desarrollando sistema asíncrono con la utilización de colas
+# Grupo 2 - DSY2206 - Sistema SaludAlerta
+#
+# Levanta: RabbitMQ + Productor 1 (alertas) + Productor 2 (resumen)
+#          + Consumidor 1 (Oracle) + Consumidor 2 (JSON)
+
 services:
+
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq
+    container_name: rabbitmq_grupo2
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  producer1-alertas:
+    build: ./producer1-alertas
+    container_name: producer1_alertas_grupo2
+    ports:
+      - "8086:8086"
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    volumes:
+      - ../Wallet_AlertasDB:/wallet-source:ro
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  producer2-resumen:
+    build: ./producer2-resumen
+    container_name: producer2_resumen_grupo2
+    ports:
+      - "8085:8085"
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  consumer1-oracle:
+    build: ./consumer1-oracle
+    container_name: consumer1_oracle_grupo2
+    ports:
+      - "8082:8082"
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+    volumes:
+      - ../Wallet_AlertasDB:/wallet-source:ro
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  consumer2-json:
+    build: ./consumer2-json
+    container_name: consumer2_json_grupo2
+    ports:
+      - "8084:8084"
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - ALERTAS_OUTPUT_DIR=/data/alertas-json
+    volumes:
+      - ../alertas-json:/data/alertas-json
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
