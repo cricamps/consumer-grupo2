@@ -44,6 +44,9 @@ public class HistorialSigno {
     @Column(name = "COLA")
     private String cola;
 
+    @Column(name = "REVISADO")
+    private Boolean revisado = false;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -70,4 +73,7 @@ public class HistorialSigno {
 
     public String getCola() { return cola; }
     public void setCola(String cola) { this.cola = cola; }
+
+    public Boolean getRevisado() { return revisado; }
+    public void setRevisado(Boolean revisado) { this.revisado = revisado; }
 }
